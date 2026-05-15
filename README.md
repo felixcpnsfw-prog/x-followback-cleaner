@@ -8,6 +8,8 @@ Support links in the extension popup: [Buy me a coffee](https://www.buymeacoffee
 
 Privacy policy: [PRIVACY.md](PRIVACY.md).
 
+Demo video: [docs/media/x-followback-cleaner-demo.mp4](docs/media/x-followback-cleaner-demo.mp4). Source: [demo-video](demo-video).
+
 它會比較「followers」與「following」資料，找出「你有 follow、但對方沒有 follow back」的帳號，並產生：
 
 - `non_followbacks.csv`：可再處理的未回關清單

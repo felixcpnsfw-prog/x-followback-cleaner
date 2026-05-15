@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #07111f;
+        color: #eef3f8;
+        font-family: "PingFang TC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 16% 18%, rgba(118, 169, 250, 0.18), rgba(118, 169, 250, 0) 34%),
+          radial-gradient(circle at 84% 74%, rgba(94, 234, 212, 0.12), rgba(94, 234, 212, 0) 32%),
+          #07111f;
+      }
+
+      .ambient-grid {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        opacity: 0.32;
+        background-image:
+          linear-gradient(rgba(118, 169, 250, 0.12) 1px, rgba(7, 17, 31, 0) 1px),
+          linear-gradient(90deg, rgba(118, 169, 250, 0.12) 1px, rgba(7, 17, 31, 0) 1px);
+        background-size: 84px 84px;
+        mask-image: radial-gradient(circle at 50% 45%, #000 0%, rgba(0, 0, 0, 0.65) 52%, rgba(0, 0, 0, 0) 88%);
+      }
+
+      .glow-a,
+      .glow-b {
+        position: absolute;
+        z-index: 0;
+        border-radius: 999px;
+        filter: blur(12px);
+        pointer-events: none;
+      }
+
+      .glow-a {
+        width: 560px;
+        height: 560px;
+        left: -180px;
+        top: -120px;
+        background: rgba(118, 169, 250, 0.15);
+      }
+
+      .glow-b {
+        width: 480px;
+        height: 480px;
+        right: -130px;
+        bottom: -160px;
+        background: rgba(94, 234, 212, 0.11);
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0;
+        transform: translateX(2200px);
+      }
+
+      .scene-content {
+        width: 100%;
+        height: 100%;
+        padding: 92px 118px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        box-sizing: border-box;
+      }
+
+      .centered {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+        gap: 58px;
+        align-items: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: #76a9fa;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 42px;
+        height: 2px;
+        background: #76a9fa;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 900;
+        letter-spacing: 0.01em;
+        line-height: 0.96;
+      }
+
+      h1 {
+        max-width: 1180px;
+        font-size: 126px;
+      }
+
+      h2 {
+        max-width: 860px;
+        font-size: 86px;
+      }
+
+      .lead {
+        max-width: 900px;
+        color: #c9d5e5;
+        font-size: 34px;
+        font-weight: 360;
+        line-height: 1.38;
+      }
+
+      .small-note {
+        color: #9ba7b7;
+        font-size: 24px;
+        line-height: 1.45;
+      }
+
+      .cat-mark {
+        width: 128px;
+        height: 128px;
+        border: 1px solid rgba(118, 169, 250, 0.36);
+        border-radius: 28px;
+        background: #111821;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 14px;
+        max-width: 1040px;
+      }
+
+      .pill {
+        border: 1px solid #2d3747;
+        border-radius: 999px;
+        background: rgba(17, 24, 33, 0.82);
+        color: #eef3f8;
+        padding: 14px 20px;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 22px;
+      }
+
+      .browser {
+        border: 1px solid #2d3747;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #0b1324;
+        box-shadow: 0 24px 90px rgba(0, 0, 0, 0.36);
+      }
+
+      .browser-bar {
+        height: 58px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid #2d3747;
+        background: #111821;
+        padding: 0 22px;
+      }
+
+      .dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #f59e0b;
+      }
+
+      .dot:nth-child(2) {
+        background: #76a9fa;
+      }
+
+      .dot:nth-child(3) {
+        background: #5eead4;
+      }
+
+      .url {
+        flex: 1;
+        height: 32px;
+        border: 1px solid #2d3747;
+        border-radius: 999px;
+        background: #07111f;
+        color: #9ba7b7;
+        padding: 6px 18px;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 18px;
+        text-align: left;
+      }
+
+      .mock-body {
+        padding: 26px;
+      }
+
+      .popup {
+        width: 430px;
+        border: 1px solid #2d3747;
+        border-radius: 14px;
+        background: #171d26;
+        padding: 18px;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+      }
+
+      .popup-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: start;
+        margin-bottom: 16px;
+      }
+
+      .popup-title {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 30px;
+        font-weight: 900;
+      }
+
+      .creator {
+        color: #76a9fa;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 16px;
+      }
+
+      .status-box {
+        border: 1px solid #2d3747;
+        border-radius: 10px;
+        background: #111821;
+        color: #9ba7b7;
+        padding: 12px;
+        font-size: 18px;
+      }
+
+      .metric-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 14px 0;
+      }
+
+      .metric {
+        border: 1px solid #2d3747;
+        border-radius: 10px;
+        background: #111821;
+        padding: 14px;
+      }
+
+      .metric span {
+        display: block;
+        color: #9ba7b7;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 30px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .panel {
+        border: 1px solid #2d3747;
+        border-radius: 12px;
+        background: #111821;
+        padding: 14px;
+        margin-top: 10px;
+      }
+
+      .panel-title {
+        margin-bottom: 10px;
+        color: #eef3f8;
+        font-size: 21px;
+        font-weight: 800;
+      }
+
+      .field {
+        border: 1px solid #2d3747;
+        border-radius: 9px;
+        background: #07111f;
+        color: #eef3f8;
+        padding: 11px 12px;
+        font-size: 18px;
+      }
+
+      .guide-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 88px 126px;
+        gap: 8px;
+        align-items: center;
+        border: 1px solid #2d3747;
+        border-radius: 10px;
+        background: #172231;
+        padding: 10px;
+        margin-top: 9px;
+      }
+
+      .guide-row strong,
+      .guide-row span {
+        display: block;
+      }
+
+      .guide-row strong {
+        font-size: 18px;
+      }
+
+      .guide-row span {
+        color: #9ba7b7;
+        font-size: 15px;
+      }
+
+      .btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 40px;
+        border: 1px solid #76a9fa;
+        border-radius: 9px;
+        background: #10243a;
+        color: #eef3f8;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .btn.secondary {
+        background: transparent;
+        color: #eef3f8;
+        border-color: #2d3747;
+      }
+
+      .btn.danger {
+        background: #3f111c;
+        border-color: #fb7185;
+        color: #fff1f2;
+      }
+
+      .step-list {
+        display: grid;
+        gap: 16px;
+      }
+
+      .step-item {
+        display: grid;
+        grid-template-columns: 54px minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+      }
+
+      .step-num {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: rgba(118, 169, 250, 0.16);
+        color: #76a9fa;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      .step-copy strong {
+        display: block;
+        font-size: 27px;
+      }
+
+      .step-copy span {
+        display: block;
+        margin-top: 4px;
+        color: #9ba7b7;
+        font-size: 22px;
+        line-height: 1.34;
+      }
+
+      .x-page {
+        min-height: 540px;
+        border: 1px solid #2d3747;
+        border-radius: 16px;
+        background: #05080d;
+        padding: 28px;
+      }
+
+      .x-top {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #2d3747;
+        padding-bottom: 18px;
+        color: #eef3f8;
+        font-size: 26px;
+        font-weight: 900;
+      }
+
+      .user-cell {
+        display: grid;
+        grid-template-columns: 58px minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+        padding: 18px 0;
+        border-bottom: 1px solid rgba(45, 55, 71, 0.74);
+      }
+
+      .avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #76a9fa, #5eead4);
+      }
+
+      .user-name {
+        color: #eef3f8;
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .handle {
+        color: #9ba7b7;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 17px;
+      }
+
+      .following-btn {
+        border: 1px solid #2d3747;
+        border-radius: 999px;
+        color: #eef3f8;
+        padding: 10px 18px;
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .scan-overlay,
+      .api-overlay {
+        border: 1px solid rgba(118, 169, 250, 0.72);
+        border-radius: 14px;
+        background: #07111f;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.44);
+        padding: 18px;
+      }
+
+      .scan-overlay {
+        width: 360px;
+      }
+
+      .api-overlay {
+        width: 560px;
+      }
+
+      .overlay-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 900;
+      }
+
+      .progress {
+        position: relative;
+        height: 12px;
+        margin: 16px 0;
+        border-radius: 999px;
+        background: #172231;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 72%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #76a9fa, #5eead4);
+      }
+
+      .scan-stats,
+      .api-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .stat {
+        border: 1px solid #2d3747;
+        border-radius: 10px;
+        background: #111821;
+        padding: 10px;
+      }
+
+      .stat span {
+        display: block;
+        color: #9ba7b7;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 14px;
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 2px;
+        font-size: 25px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .table {
+        border: 1px solid #2d3747;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #111821;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr 1fr;
+        gap: 18px;
+        padding: 18px 22px;
+        border-bottom: 1px solid #2d3747;
+        font-size: 21px;
+      }
+
+      .row.head {
+        color: #76a9fa;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 18px;
+        text-transform: uppercase;
+      }
+
+      .row:last-child {
+        border-bottom: none;
+      }
+
+      .allowlist {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .allow {
+        border: 1px solid rgba(94, 234, 212, 0.42);
+        border-radius: 999px;
+        color: #5eead4;
+        background: rgba(94, 234, 212, 0.08);
+        padding: 10px 16px;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 18px;
+      }
+
+      .csv-card {
+        border: 1px solid #2d3747;
+        border-radius: 18px;
+        background: #111821;
+        overflow: hidden;
+      }
+
+      .csv-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #2d3747;
+        padding: 18px 22px;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        color: #76a9fa;
+        font-size: 20px;
+      }
+
+      .csv-lines {
+        padding: 22px;
+        color: #c9d5e5;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 20px;
+        line-height: 1.75;
+        white-space: pre-wrap;
+      }
+
+      .api-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .donate-strip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        border: 1px solid rgba(118, 169, 250, 0.24);
+        border-radius: 16px;
+        background: #111821;
+        padding: 18px 22px;
+      }
+
+      .donate-buttons {
+        display: flex;
+        gap: 12px;
+      }
+
+      .address {
+        border: 1px solid #2d3747;
+        border-radius: 14px;
+        background: #07111f;
+        padding: 18px;
+        color: #c9d5e5;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 22px;
+        overflow-wrap: anywhere;
+      }
+
+      .repo-url {
+        color: #76a9fa;
+        font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+        font-size: 30px;
+      }
+
+      .footer-brand {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="62"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="ambient-grid" data-layout-ignore></div>
+      <div class="glow-a" data-layout-ignore></div>
+      <div class="glow-b" data-layout-ignore></div>
+
+      <section id="scene-1" class="scene">
+        <div class="scene-content centered">
+          <img class="cat-mark enter-logo fade-end" src="assets/icon128.png" alt="X Followback Cleaner icon" />
+          <div class="eyebrow enter-a fade-end">Open-source X utility</div>
+          <h1 class="enter-b fade-end">X Followback Cleaner</h1>
+          <p class="lead enter-c fade-end">不用依賴 Unfollr，也不用上架 Chrome 商店。手動載入 extension，就能掃描、比對、匯出與批次退追。</p>
+          <div class="badge-row enter-d fade-end">
+            <span class="pill">Scan followers</span>
+            <span class="pill">Compare snapshots</span>
+            <span class="pill">Export CSV</span>
+            <span class="pill">Pauseable unfollow</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-2" class="scene">
+        <div class="scene-content split">
+          <div>
+            <div class="eyebrow enter-a fade-end">Step 1</div>
+            <h2 class="enter-b fade-end">先從 GitHub 載入插件</h2>
+            <p class="lead enter-c fade-end">不用付 Chrome Web Store 上架費。下載 repo 後，到 Chrome extensions 開啟 Developer mode，選擇 Load unpacked。</p>
+          </div>
+          <div class="browser enter-d fade-end">
+            <div class="browser-bar">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <div class="url">chrome://extensions</div>
+            </div>
+            <div class="mock-body">
+              <div class="step-list">
+                <div class="step-item">
+                  <div class="step-num">01</div>
+                  <div class="step-copy">
+                    <strong>Developer mode</strong>
+                    <span>右上角打開開發者模式。</span>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">02</div>
+                  <div class="step-copy">
+                    <strong>Load unpacked</strong>
+                    <span>選擇 x-followback-cleaner/extension。</span>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">03</div>
+                  <div class="step-copy">
+                    <strong>Pin extension</strong>
+                    <span>固定在工具列，之後在 x.com 直接使用。</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-3" class="scene">
+        <div class="scene-content split">
+          <div class="popup enter-d fade-end">
+            <div class="popup-head">
+              <div>
+                <div class="popup-title">X Followback Cleaner</div>
+                <div class="creator">by @ProfitKatze</div>
+              </div>
+              <div class="status-box">請先打開 x.com 頁面</div>
+            </div>
+            <div class="metric-row">
+              <div class="metric"><span>Snapshots</span><strong>0</strong></div>
+              <div class="metric"><span>Non-followbacks</span><strong>0</strong></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">建立快照</div>
+              <div class="field">@ProfitKatze</div>
+              <div class="guide-row">
+                <div><strong>Followers</strong><span>自動前往並開始掃描</span></div>
+                <div class="btn secondary">Open</div>
+                <div class="btn">Open + Scan</div>
+              </div>
+              <div class="guide-row">
+                <div><strong>Following</strong><span>Followers 完成後再掃</span></div>
+                <div class="btn secondary">Open</div>
+                <div class="btn">Open + Scan</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="eyebrow enter-a fade-end">Step 2</div>
+            <h2 class="enter-b fade-end">用 Open + Scan 建立兩份快照</h2>
+            <p class="lead enter-c fade-end">先掃 followers，再掃 following。掃描時插件會暫時縮小頁面，一次讀更多帳號，完成後自動恢復。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-4" class="scene">
+        <div class="scene-content split">
+          <div>
+            <div class="eyebrow enter-a fade-end">Scanning</div>
+            <h2 class="enter-b fade-end">掃描進度會顯示在 X 頁面</h2>
+            <p class="lead enter-c fade-end">Followers 完成後，提示你換成 following scan。Following 完成後，再回插件選兩份快照比對。</p>
+          </div>
+          <div class="browser enter-d fade-end">
+            <div class="browser-bar">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <div class="url">x.com/ProfitKatze/followers</div>
+            </div>
+            <div class="mock-body x-page">
+              <div class="x-top">
+                <span>Followers</span>
+                <span>@ProfitKatze</span>
+              </div>
+              <div class="user-cell">
+                <div class="avatar"></div>
+                <div><div class="user-name">Open Source Builder</div><div class="handle">@oss_builder</div></div>
+                <div class="following-btn">Following</div>
+              </div>
+              <div class="user-cell">
+                <div class="avatar"></div>
+                <div><div class="user-name">Creator Tools</div><div class="handle">@creator_tools</div></div>
+                <div class="following-btn">Following</div>
+              </div>
+              <div class="scan-overlay">
+                <div class="overlay-title">
+                  <span>Scanning snapshot</span>
+                  <span>812</span>
+                </div>
+                <div class="progress"><div class="progress-fill scan-fill"></div></div>
+                <p class="small-note">followers: 812 found, 36 scrolls</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-5" class="scene">
+        <div class="scene-content split">
+          <div class="table enter-d fade-end">
+            <div class="row head">
+              <span>Username</span>
+              <span>Status</span>
+              <span>Protected?</span>
+            </div>
+            <div class="row">
+              <span>@builder_alpha</span>
+              <span>non-followback</span>
+              <span>No</span>
+            </div>
+            <div class="row">
+              <span>@openai</span>
+              <span>non-followback</span>
+              <span>Yes</span>
+            </div>
+            <div class="row">
+              <span>@market_notes</span>
+              <span>non-followback</span>
+              <span>No</span>
+            </div>
+          </div>
+          <div>
+            <div class="eyebrow enter-a fade-end">Step 3</div>
+            <h2 class="enter-b fade-end">比對前先保護重要帳號</h2>
+            <p class="lead enter-c fade-end">官方號或你手動保護的 handles，會從結果中排除，不會被匯出或送進 unfollow batch。</p>
+            <div class="allowlist enter-e fade-end">
+              <span class="allow">openai</span>
+              <span class="allow">tesla</span>
+              <span class="allow">github</span>
+              <span class="allow">sama</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-6" class="scene">
+        <div class="scene-content split">
+          <div>
+            <div class="eyebrow enter-a fade-end">Step 4</div>
+            <h2 class="enter-b fade-end">匯出 CSV 或開始批次退追</h2>
+            <p class="lead enter-c fade-end">CSV 給你完整審核清單。Fast API unfollow 不跳 profile，會使用已登入的 X web session，並在 rate limit 或授權錯誤時停止。</p>
+          </div>
+          <div class="csv-card enter-d fade-end">
+            <div class="csv-head">
+              <span>non_followbacks.csv</span>
+              <span>Export CSV</span>
+            </div>
+            <div class="csv-lines">Username,Display Name,Profile URL,Status
+builder_alpha,Builder Alpha,https://x.com/builder_alpha,review
+market_notes,Market Notes,https://x.com/market_notes,review
+crypto_writer,Crypto Writer,https://x.com/crypto_writer,review</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-7" class="scene">
+        <div class="scene-content split">
+          <div class="browser enter-d fade-end">
+            <div class="browser-bar">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <div class="url">x.com/home</div>
+            </div>
+            <div class="mock-body">
+              <div class="api-overlay">
+                <div class="overlay-title">
+                  <span>🐱 X Followback Cleaner</span>
+                  <span>⚡ Running</span>
+                </div>
+                <div class="api-stats">
+                  <div class="stat"><span>Progress</span><strong>87/224</strong></div>
+                  <div class="stat"><span>Success</span><strong>87</strong></div>
+                  <div class="stat"><span>Left</span><strong>137</strong></div>
+                </div>
+                <div class="progress"><div class="progress-fill api-fill"></div></div>
+                <p class="small-note">unfollowed @builder_alpha</p>
+                <div class="api-controls">
+                  <div class="btn secondary">⏸ Pause</div>
+                  <div class="btn danger">🛑 Stop</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="eyebrow enter-a fade-end">Control panel</div>
+            <h2 class="enter-b fade-end">批次開始後，控制都在頁面上</h2>
+            <p class="lead enter-c fade-end">Popup 會自動收起，不擋畫面。需要休息就 Pause，回來按 Resume；想停止就 Stop。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="scene-8" class="scene">
+        <div class="scene-content centered">
+          <div class="footer-brand enter-a fade-end">
+            <img class="cat-mark" src="assets/icon128-final.png" alt="X Followback Cleaner icon" />
+            <div>
+              <div class="eyebrow">Local first</div>
+              <h2>X Followback Cleaner</h2>
+            </div>
+          </div>
+          <p class="lead enter-b fade-end">開源、可審核、資料留在本機。覺得有幫助，可以追蹤 @ProfitKatze，或用 Coffee / Stablecoin 支持。</p>
+          <div class="donate-strip enter-c fade-end">
+            <span class="small-note">Support creator</span>
+            <div class="donate-buttons">
+              <span class="pill">Buy me a coffee</span>
+              <span class="pill">USDT / USDC</span>
+            </div>
+          </div>
+          <div class="address enter-d fade-end">0x460f5e356b74701E9e8AE8DAa50126bE3968C475</div>
+          <div class="repo-url enter-e fade-end">github.com/felixcpnsfw-prog/x-followback-cleaner</div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const duration = 62;
+      const sceneStarts = [0, 7.8, 15.6, 24.2, 32.0, 40.0, 48.2, 56.0];
+      const scenes = ["#scene-1", "#scene-2", "#scene-3", "#scene-4", "#scene-5", "#scene-6", "#scene-7", "#scene-8"];
+
+      function transition(fromScene, toScene, time) {
+        tl.to(fromScene, { x: -70, opacity: 0, duration: 0.5, ease: "power2.inOut" }, time);
+        tl.set(fromScene, { x: -2200 }, time + 0.52);
+        tl.fromTo(toScene, { x: 84, opacity: 0 }, { x: 0, opacity: 1, duration: 0.58, ease: "power3.out" }, time + 0.06);
+      }
+
+      function fromIfExists(selector, vars, position) {
+        if (document.querySelector(selector)) {
+          tl.from(selector, vars, position);
+        }
+      }
+
+      function enter(scene, time) {
+        fromIfExists(`${scene} .enter-logo`, { scale: 0.82, opacity: 0, duration: 0.42, ease: "back.out(1.6)" }, time + 0.26);
+        fromIfExists(`${scene} .enter-a`, { y: 28, opacity: 0, duration: 0.42, ease: "power2.out" }, time + 0.36);
+        fromIfExists(`${scene} .enter-b`, { x: -46, opacity: 0, duration: 0.58, ease: "expo.out" }, time + 0.54);
+        fromIfExists(`${scene} .enter-c`, { y: 34, opacity: 0, duration: 0.48, ease: "sine.out" }, time + 0.78);
+        fromIfExists(`${scene} .enter-d`, { scale: 0.96, y: 38, opacity: 0, duration: 0.56, ease: "power3.out" }, time + 0.98);
+        fromIfExists(`${scene} .enter-e`, { y: 24, opacity: 0, duration: 0.38, ease: "circ.out" }, time + 1.2);
+      }
+
+      tl.set("#scene-1", { opacity: 1, x: 0 }, 0);
+      scenes.forEach((scene, index) => enter(scene, sceneStarts[index]));
+      for (let i = 1; i < scenes.length; i += 1) {
+        transition(scenes[i - 1], scenes[i], sceneStarts[i] - 0.48);
+      }
+
+      tl.from(".scan-fill", { width: "18%", duration: 4.2, ease: "power1.inOut" }, 25.4);
+      tl.from(".api-fill", { width: "20%", duration: 5.1, ease: "power1.inOut" }, 49.4);
+      tl.to(".glow-a", { scale: 1.08, opacity: 0.72, duration: 4, repeat: Math.floor(duration / 4) - 1, yoyo: true, ease: "sine.inOut" }, 0);
+      tl.to(".glow-b", { scale: 1.1, opacity: 0.8, duration: 5, repeat: Math.floor(duration / 5) - 1, yoyo: true, ease: "sine.inOut" }, 0);
+      tl.to(".ambient-grid", { x: -42, y: -42, duration: duration, ease: "none" }, 0);
+      tl.to("#scene-8 .fade-end", { y: -18, opacity: 0, duration: 0.55, stagger: 0.06, ease: "power2.in" }, 61.0);
+      tl.to("#root", { backgroundColor: "#050b14", duration: 0.6, ease: "sine.inOut" }, 61.2);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
