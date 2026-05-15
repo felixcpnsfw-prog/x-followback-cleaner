@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "X Followback Cleaner",
+  "short_name": "Followback",
+  "version": "0.1.0",
+  "description": "X followback snapshot, compare, export, and assisted unfollow by @ProfitKatze.",
+  "homepage_url": "https://x.com/ProfitKatze",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["activeTab", "downloads", "scripting", "storage", "unlimitedStorage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "X Followback Cleaner",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["lib/core.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

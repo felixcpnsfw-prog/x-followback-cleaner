@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "x-followback-cleaner"
+version = "0.1.0"
+description = "Local CSV comparison and review queue for X/Twitter non-followbacks."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "ProfitKatze" }]
+keywords = ["x", "twitter", "followers", "following", "csv", "social"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.scripts]
+xfbc = "x_followback_cleaner.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

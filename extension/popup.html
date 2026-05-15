@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>X Followback Cleaner</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="app-header">
+      <div>
+        <h1>X Followback Cleaner</h1>
+        <p>掃描、比對、匯出，必要時批次取消未回關。</p>
+        <a class="creator-link" href="https://x.com/ProfitKatze" target="_blank" rel="noreferrer">by @ProfitKatze</a>
+      </div>
+      <div id="status" class="status">請先打開 x.com 頁面</div>
+    </header>
+
+    <section class="metrics" aria-label="Current counts">
+      <div class="metric">
+        <span class="metric-label">Snapshots</span>
+        <strong id="snapshotCount">0</strong>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Non-followbacks</span>
+        <strong id="resultCount">0</strong>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="step">1</span>
+        <div>
+          <h2>建立快照</h2>
+          <p>輸入你的 X handle，或在個人頁打開插件自動偵測。</p>
+        </div>
+      </div>
+
+      <label for="ownHandle">Your X handle</label>
+      <input id="ownHandle" type="text" placeholder="ProfitKatze">
+
+      <div class="guide">
+        <div>
+          <strong>Followers</strong>
+          <span>建議直接用 Open + Scan，自動前往頁面並開始掃描。</span>
+        </div>
+        <button id="openFollowers" class="secondary" type="button">Open</button>
+        <button id="openScanFollowers" type="button">Open + Scan</button>
+      </div>
+
+      <div class="guide">
+        <div>
+          <strong>Following</strong>
+          <span>Followers 完成後，用 Open + Scan 建立 following 快照。</span>
+        </div>
+        <button id="openFollowing" class="secondary" type="button">Open</button>
+        <button id="openScanFollowing" type="button">Open + Scan</button>
+      </div>
+
+      <button id="stopScan" class="secondary stop-scan" type="button">Stop active scan</button>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <span class="step">2</span>
+        <div>
+          <h2>比對名單</h2>
+          <p>選擇兩份快照，產生未回關清單。</p>
+        </div>
+      </div>
+
+      <label for="followersSnapshot">Followers snapshot</label>
+      <select id="followersSnapshot"></select>
+
+      <label for="followingSnapshot">Following snapshot</label>
+      <select id="followingSnapshot"></select>
+
+      <label for="allowlist">Protected handles</label>
+      <textarea id="allowlist" rows="3" placeholder="openai&#10;sama"></textarea>
+
+      <label class="check-row">
+        <input id="protectOfficial" type="checkbox" checked>
+        <span>Protect common official accounts</span>
+      </label>
+      <p id="protectedSummary" class="microcopy"></p>
+
+      <div class="button-row">
+        <button id="compare" type="button">Compare</button>
+        <button id="exportCsv" type="button" disabled>Export CSV</button>
+      </div>
+    </section>
+
+    <section class="panel results-panel">
+      <div class="panel-head compact">
+        <span class="step">3</span>
+        <div>
+          <h2>未回關預覽</h2>
+          <p>最多顯示前 80 筆；完整名單可匯出 CSV。</p>
+        </div>
+      </div>
+      <div id="results" class="results">
+        <div class="empty-state">尚未比對。完成兩份快照後按 Compare。</div>
+      </div>
+    </section>
+
+    <section class="panel danger">
+      <div class="panel-head">
+        <span class="step danger-step">4</span>
+        <div>
+          <h2>取消跟隨</h2>
+          <p>Fast API 模式不跳 profile；遇到授權或 rate limit 會停止。</p>
+        </div>
+      </div>
+
+      <div class="delay-row">
+        <label for="unfollowDelay">Delay</label>
+        <input id="unfollowDelay" type="number" min="1.2" step="0.1" value="2.5">
+        <span>seconds</span>
+      </div>
+
+      <button id="startApiUnfollow" class="danger-button" type="button" disabled>Fast API unfollow</button>
+      <div id="apiConfirmPanel" class="confirm-panel" hidden>
+        <strong>Confirm Fast API unfollow</strong>
+        <p id="apiConfirmText"></p>
+        <p class="microcopy">Start batch 後 popup 會自動收起，請在 X 頁面右上角控制暫停、繼續或停止。</p>
+        <div class="button-row">
+          <button id="confirmApiUnfollow" class="danger-button" type="button">Start batch</button>
+          <button id="cancelApiUnfollow" class="secondary" type="button">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="support-footer">
+      <div class="support-copy">
+        <span>覺得工具有幫助？</span>
+        <small>咖啡或穩定幣都可以</small>
+      </div>
+      <div class="support-actions">
+        <a id="coffeeDonate" class="coffee-link" href="https://www.buymeacoffee.com/ProfitKatze" target="_blank" rel="noreferrer">Coffee</a>
+        <button id="stablecoinDonate" class="stablecoin-link" type="button">Stablecoin</button>
+      </div>
+      <div id="stablecoinPanel" class="stablecoin-panel" hidden>
+        <strong id="stablecoinTitle">Stablecoin donate</strong>
+        <p id="stablecoinText"></p>
+        <div id="stablecoinAddressRow" class="stablecoin-address-row" hidden>
+          <code id="stablecoinAddress"></code>
+          <button id="copyStablecoinAddress" class="secondary" type="button">Copy</button>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="lib/core.js"></script>
+  <script src="lib/donate-config.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
