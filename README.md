@@ -6,6 +6,8 @@ Created by [@ProfitKatze](https://x.com/ProfitKatze).
 
 Support links in the extension popup: [Buy me a coffee](https://www.buymeacoffee.com/ProfitKatze) and an optional stablecoin donate entry.
 
+Privacy policy: [PRIVACY.md](PRIVACY.md).
+
 它會比較「followers」與「following」資料，找出「你有 follow、但對方沒有 follow back」的帳號，並產生：
 
 - `non_followbacks.csv`：可再處理的未回關清單
